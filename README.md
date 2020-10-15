@@ -1,2 +1,3 @@
 # kia
-opinionated kubernetes infrastructure automation
+
+Opinionated kubernetes infrastructure automation.
