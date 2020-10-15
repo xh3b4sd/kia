@@ -1,9 +1,9 @@
 package project
 
 var (
-	description = "Command line tool for generating github workflows."
+	description = "Opinionated kubernetes infrastructure automation."
 	gitSHA      = "n/a"
-	name        = "workflow"
+	name        = "kia"
 	source      = "https://github.com/xh3b4sd/kia"
 	version     = "n/a"
 )

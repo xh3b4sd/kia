@@ -20,7 +20,7 @@ as follows.
 Generating zsh completion for Oh My Zsh can be done by writing the
 generated completion to the custom plugin folder.
 
-    mkdir -p ~/.oh-my-zsh/custom/plugins/workflow && workflow completion zsh > ~/.oh-my-zsh/custom/plugins/workflow/_workflow
+    mkdir -p ~/.oh-my-zsh/custom/plugins/kia && kia completion zsh > ~/.oh-my-zsh/custom/plugins/kia/_kia
 
 	`
 )
