@@ -1,0 +1,19 @@
+apiVersion: "install.istio.io/v1alpha1"
+kind: "IstioOperator"
+spec:
+  components:
+    ingressGateways:
+      - name: "istio-ingressgateway"
+        enabled: true
+        k8s:
+          overlays:
+            - apiVersion: "v1"
+              kind: "Service"
+              name: "istio-ingressgateway"
+              patches:
+                - path: "spec.ports[4]"
+                  value:
+                    name: "grpc"
+                    nodePort: 30007
+                    port: 30007
+                    targetPort: 7777
