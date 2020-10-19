@@ -1,4 +1,4 @@
-package create
+package osx
 
 import (
 	"context"
@@ -9,13 +9,19 @@ import (
 )
 
 type runner struct {
+	flag   *flag
 	logger logger.Interface
 }
 
 func (r *runner) Run(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
-	err := r.run(ctx, cmd, args)
+	err := r.flag.Validate()
+	if err != nil {
+		return tracer.Mask(err)
+	}
+
+	err = r.run(ctx, cmd, args)
 	if err != nil {
 		return tracer.Mask(err)
 	}

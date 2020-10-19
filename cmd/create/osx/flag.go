@@ -1,4 +1,4 @@
-package create
+package osx
 
 import (
 	"github.com/spf13/cobra"
