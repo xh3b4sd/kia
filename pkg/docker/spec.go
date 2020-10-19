@@ -1,15 +1,16 @@
 package docker
 
-// AuthEncoder ...
 type AuthEncoder interface {
-	// Encode ...
+	// Encode computes the base64 encoded docker config JSON string used to
+	// template kubernetes pull secrets. The actual data structure of the
+	// encoded result looks like the example below.
 	//
 	//     {
 	//         "auths": {
-	//             "ghcr.io": {
-	//                 "username": "...",
-	//                 "password": "...",
-	//                 "auth": "..."
+	//             "<registry>": {
+	//                 "username": "<username>",
+	//                 "password": "<password>",
+	//                 "auth": "<auth>"
 	//             }
 	//         }
 	//     }

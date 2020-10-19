@@ -15,20 +15,20 @@ const (
 )
 
 type AuthConfig struct {
-	Bytes []byte
+	Secrets map[string]string
 }
 
 type Auth struct {
-	bytes []byte
+	secrets map[string]string
 }
 
 func NewAuth(config AuthConfig) (*Auth, error) {
-	if config.Bytes == nil {
-		return nil, tracer.Maskf(invalidConfigError, "%T.Bytes must not be empty", config)
+	if config.Secrets == nil {
+		return nil, tracer.Maskf(invalidConfigError, "%T.Secrets must not be empty", config)
 	}
 
 	a := &Auth{
-		bytes: config.Bytes,
+		secrets: config.Secrets,
 	}
 
 	return a, nil
@@ -37,15 +37,9 @@ func NewAuth(config AuthConfig) (*Auth, error) {
 func (a *Auth) Encode() (string, error) {
 	var ok bool
 
-	m := map[string]string{}
-	err := json.Unmarshal(a.bytes, &m)
-	if err != nil {
-		return "", tracer.Mask(err)
-	}
-
 	var password string
 	{
-		password, ok = m[Password]
+		password, ok = a.secrets[Password]
 		if !ok {
 			return "", tracer.Maskf(executionFailedError, "no secret for %#q", Password)
 		}
@@ -53,7 +47,7 @@ func (a *Auth) Encode() (string, error) {
 
 	var registry string
 	{
-		registry, ok = m[Registry]
+		registry, ok = a.secrets[Registry]
 		if !ok {
 			return "", tracer.Maskf(executionFailedError, "no secret for %#q", Registry)
 		}
@@ -61,7 +55,7 @@ func (a *Auth) Encode() (string, error) {
 
 	var username string
 	{
-		username, ok = m[Username]
+		username, ok = a.secrets[Username]
 		if !ok {
 			return "", tracer.Maskf(executionFailedError, "no secret for %#q", Username)
 		}
