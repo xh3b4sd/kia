@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	name        = project.Name()
-	description = project.Description()
+	name  = project.Name()
+	short = project.Description()
+	long  = project.Description()
 )
 
 type Config struct {
@@ -71,8 +72,8 @@ func New(config Config) (*cobra.Command, error) {
 
 		c = &cobra.Command{
 			Use:   name,
-			Short: description,
-			Long:  description,
+			Short: short,
+			Long:  long,
 			RunE:  r.Run,
 			// We slience errors because we do not want to see spf13/cobra printing.
 			// The errors returned by the commands will be propagated to the main.go

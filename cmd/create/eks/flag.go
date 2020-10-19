@@ -1,4 +1,4 @@
-package create
+package eks
 
 import (
 	"github.com/spf13/cobra"

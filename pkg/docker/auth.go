@@ -3,7 +3,6 @@ package docker
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 
 	"github.com/xh3b4sd/tracer"
 )
@@ -83,7 +82,7 @@ func (a *Auth) Encode() (string, error) {
 			return "", tracer.Mask(err)
 		}
 
-		enc = fmt.Sprintf("%s\n", base64.URLEncoding.EncodeToString(b))
+		enc = base64.URLEncoding.EncodeToString(b)
 	}
 
 	return enc, nil
