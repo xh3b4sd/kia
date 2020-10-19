@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	name  = "grpc"
+	name  = "osx"
 	short = "Create kubernetes infrastructure environments for osx."
 	long  = "Create kubernetes infrastructure environments for osx."
 )

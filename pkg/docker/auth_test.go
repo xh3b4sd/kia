@@ -3,6 +3,7 @@ package docker
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strconv"
@@ -126,14 +127,18 @@ func Test_Docker_Auth_Encode_Golden(t *testing.T) {
 				}
 			}
 
-			actual, err := a.Encode()
-			if err != nil {
-				t.Fatal(err)
+			var actual []byte
+			{
+				enc, err := a.Encode()
+				if err != nil {
+					t.Fatal(err)
+				}
+				actual = []byte(fmt.Sprintf("%s\n", enc))
 			}
 
 			p := filepath.Join("testdata/auth", fileName(i))
 			if *update {
-				err := ioutil.WriteFile(p, []byte(actual), 0644) // nolint:gosec
+				err := ioutil.WriteFile(p, actual, 0644) // nolint:gosec
 				if err != nil {
 					t.Fatal(err)
 				}
