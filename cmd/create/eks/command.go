@@ -15,7 +15,7 @@ kubernetes service. For more information check the eks website.
 
     https://aws.amazon.com/eks
 
-In order to create and setup the kind cluster we need to properly configure
+In order to create and setup the eks cluster we need to properly configure
 the kia command line tool. This is done via its config file, tracked on the
 local file system. The kia base path must be set. This is the local path of
 the kia repository from which general templates are read. Add the following
