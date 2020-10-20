@@ -15,11 +15,6 @@ import (
 	"github.com/xh3b4sd/kia/pkg/docker"
 )
 
-const (
-	kia = "~/go/src/github.com/xh3b4sd/kia"
-	sec = "~/projects/xh3b4sd/secret"
-)
-
 type runner struct {
 	flag   *flag
 	logger logger.Interface
@@ -46,7 +41,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "decrypting local secrets")
 
-		out, err := exec.Command("red", "decrypt", "-i", mustAbs(sec), "-o", "-", "-s").CombinedOutput()
+		out, err := exec.Command("red", "decrypt", "-i", mustAbs(r.flag.Sec), "-o", "-", "-s").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -60,7 +55,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating kind cluster")
 
-		out, err := exec.Command("kind", "create", "cluster", "--config", mustAbs(kia, "env/osx/kind.yaml")).CombinedOutput()
+		out, err := exec.Command("kind", "create", "cluster", "--config", mustAbs(r.flag.Kia, "env/osx/kind.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -69,7 +64,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing service mesh")
 
-		out, err := exec.Command("istioctl", "install", "-f", mustAbs(kia, "env/osx/istio.yaml")).CombinedOutput()
+		out, err := exec.Command("istioctl", "install", "-f", mustAbs(r.flag.Kia, "env/osx/istio.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -96,7 +91,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing infra chart")
 
-		out, err := exec.Command("helm", "-n", "infra", "install", "infra", mustAbs(kia, "env/def/infra/"), "--set", "dockerconfigjson="+mustAuth(secrets)).CombinedOutput()
+		out, err := exec.Command("helm", "-n", "infra", "install", "infra", mustAbs(r.flag.Kia, "env/def/infra/"), "--set", "dockerconfigjson="+mustAuth(secrets)).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
