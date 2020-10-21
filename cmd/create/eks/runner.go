@@ -37,11 +37,14 @@ func (r *runner) Run(cmd *cobra.Command, args []string) error {
 }
 
 func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) error {
+	var err error
+	var out []byte
+
 	secrets := map[string]string{}
 	{
 		r.logger.Log(ctx, "level", "info", "message", "decrypting local secrets")
 
-		out, err := exec.Command("red", "decrypt", "-i", mustAbs(r.flag.Sec), "-o", "-", "-s").CombinedOutput()
+		out, err = exec.Command("red", "decrypt", "-i", mustAbs(r.flag.Sec), "-o", "-", "-s").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -55,7 +58,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating eks cluster")
 
-		out, err := exec.Command("eksctl", "create", "cluster", "--config-file", mustAbs(r.flag.Kia, "env/eks/eksctl.yaml")).CombinedOutput()
+		out, err = exec.Command("eksctl", "create", "cluster", "--config-file", mustAbs(r.flag.Kia, "env/eks/eksctl.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -64,7 +67,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing service mesh")
 
-		out, err := exec.Command("istioctl", "install", "-f", mustAbs(r.flag.Kia, "env/eks/istio.yaml")).CombinedOutput()
+		out, err = exec.Command("istioctl", "install", "-f", mustAbs(r.flag.Kia, "env/eks/istio.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -73,7 +76,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating infra namespace")
 
-		out, err := exec.Command("kubectl", "create", "namespace", "infra").CombinedOutput()
+		out, err = exec.Command("kubectl", "create", "namespace", "infra").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -82,7 +85,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "configure istio injection")
 
-		out, err := exec.Command("kubectl", "label", "namespace", "infra", "istio-injection=enabled").CombinedOutput()
+		out, err = exec.Command("kubectl", "label", "namespace", "infra", "istio-injection=enabled").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -91,7 +94,91 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing infra chart")
 
-		out, err := exec.Command("helm", "-n", "infra", "install", "infra", mustAbs(r.flag.Kia, "env/def/infra/"), "--set", "dockerconfigjson="+mustAuth(secrets)).CombinedOutput()
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"infra",
+			mustAbs(r.flag.Kia, "env/def/infra/"),
+			"--namespace", "infra",
+			"--set", "dockerconfigjson="+mustDockerAuth(secrets),
+		).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
+	// TODO create Hosted Zone in Route53.
+	//
+	//     https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#set-up-a-hosted-zone
+	//
+	// Where to find chart documentation.
+	//
+	//     https://artifacthub.io/packages/helm/bitnami/external-dns
+	//
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing external-dns chart")
+
+		out, err = exec.Command("kubectl", "create", "namespace", "cert-manager").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command("helm", "repo", "add", "bitnami", "https://charts.bitnami.com/bitnami").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command("helm", "repo", "update").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"external-dns",
+			"bitnami/external-dns",
+			"--namespace", "external-dns",
+			"--version", "v3.4.9",
+			"--set", "aws.credentials.accessKey="+secrets["aws.accessid"],
+			"--set", "aws.credentials.secretKey="+secrets["aws.secretid"],
+			"--set", "aws.region=eu-central-1",
+			"--set", "domainFilters=xh3b4sd.giantswarm.io",
+			"--set", "provider=aws",
+			"--set", "sources=istio-gateway",
+		).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing cert-manager chart")
+
+		out, err = exec.Command("kubectl", "create", "namespace", "cert-manager").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command("helm", "repo", "add", "jetstack", "https://charts.jetstack.io").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command("helm", "repo", "update").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"cert-manager",
+			"jetstack/cert-manager",
+			"--namespace", "cert-manager",
+			"--version", "v1.0.3",
+			"--set", "installCRDs=true",
+		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -109,7 +196,7 @@ func mustAbs(p ...string) string {
 	return filepath.Join(u.HomeDir, strings.TrimPrefix(filepath.Join(p...), "~/"))
 }
 
-func mustAuth(s map[string]string) string {
+func mustDockerAuth(s map[string]string) string {
 	var err error
 
 	var a docker.AuthEncoder
