@@ -1,0 +1,19 @@
+apiVersion: "cert-manager.io/v1"
+kind: "ClusterIssuer"
+metadata:
+  name: "letsencrypt-demo"
+spec:
+  acme:
+    server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+    email: "xh3b4sd@gmail.com"
+    privateKeySecretRef:
+      name: "letsencrypt-demo"
+    dns01:
+      providers:
+        - name: "kia.xh3b4sd.giantswarm.io"
+          route53:
+            accessKeyID: "{{ .Values.aws.accessid }}"
+            region: "eu-central-1"
+            secretAccessKeySecretRef:
+              name: "aws"
+              key: "secretid"
