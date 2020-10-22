@@ -8,9 +8,8 @@ spec:
     email: "xh3b4sd@gmail.com"
     privateKeySecretRef:
       name: "letsencrypt-demo"
-    dns01:
-      providers:
-        - name: "kia.xh3b4sd.giantswarm.io"
+    solvers:
+      - dns01:
           route53:
             accessKeyID: "{{ .Values.aws.accessid }}"
             region: "eu-central-1"

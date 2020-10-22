@@ -118,7 +118,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing external-dns chart")
 
-		out, err = exec.Command("kubectl", "create", "namespace", "cert-manager").CombinedOutput()
+		out, err = exec.Command("kubectl", "create", "namespace", "external-dns").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -143,9 +143,9 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"--set", "aws.credentials.accessKey="+secrets["aws.accessid"],
 			"--set", "aws.credentials.secretKey="+secrets["aws.secretid"],
 			"--set", "aws.region=eu-central-1",
-			"--set", "domainFilters=xh3b4sd.giantswarm.io",
+			"--set", "domainFilters={aws.venturemark.co}",
 			"--set", "provider=aws",
-			"--set", "sources=istio-gateway",
+			"--set", "sources={istio-gateway}",
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
@@ -178,6 +178,23 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"--namespace", "cert-manager",
 			"--version", "v1.0.3",
 			"--set", "installCRDs=true",
+		).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing cert-asset chart")
+
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"cert-asset",
+			mustAbs(r.flag.Kia, "env/eks/cert-asset/"),
+			"--namespace", "cert-manager",
+			"--set", "aws.accessid="+secrets["aws.accessid"],
+			"--set", "aws.secretid="+secrets["aws.secretid"],
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
