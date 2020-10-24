@@ -131,7 +131,10 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
 
-		io.WriteString(in, eksYaml)
+		_, err = io.WriteString(in, eksYaml)
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
 		in.Close()
 
 		out, err := cmd.CombinedOutput()
