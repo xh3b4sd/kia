@@ -6,5 +6,20 @@ spec:
       - name: "istio-ingressgateway"
         enabled: true
         k8s:
+          # We need to define certain service annotations in order to launch a
+          # properly configured ELB. Usually the backend protocol should simply
+          # be TCP. TCP ELB listeners are most suitable for encrypted and
+          # unencrypted protocols. Using TCP as backend protocol does also
+          # configure the instance health check to use plain TCP checks against
+          # the running EC2 instances. This is espacially important if other
+          # traffic is encrypted. Serving normal HTTPS or encrypted gRPC traffic
+          # via e.g. 443 is supported via TCP backend protocol, while keeping
+          # the ELB health checks working against EC2 instances. For more
+          # information about service annotations check the following resource.
+          #
+          #     https://kubernetes.io/docs/concepts/services-networking/service/#ssl-support-on-aws
+          #
           serviceAnnotations:
+            service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+            service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443,15443"
             service.beta.kubernetes.io/aws-load-balancer-type: "elb"

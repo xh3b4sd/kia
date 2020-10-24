@@ -1,0 +1,3 @@
+cluster:
+  domain: "aws.example.com"
+  name: "kia01"

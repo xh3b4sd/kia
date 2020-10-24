@@ -2,8 +2,8 @@ kind: "ClusterConfig"
 apiVersion: "eksctl.io/v1alpha5"
 
 metadata:
-  name: "kia01"
-  region: "eu-central-1"
+  name: "{{ .Cluster.Name }}"
+  region: "{{ .AWS.Region }}"
 
 nodeGroups:
   - name: "ng001"

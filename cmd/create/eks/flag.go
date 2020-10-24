@@ -11,21 +11,33 @@ import (
 )
 
 type flag struct {
-	Kia string
-	Sec string
+	Cluster string
+	KiaPath string
+	Region  string
+	SecPath string
 }
 
 func (f *flag) Init(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&f.Kia, "kia", "k", config.GetKia(os.Getenv(env.KiaBasePath)), "Kia base path on the local file system.")
-	cmd.Flags().StringVarP(&f.Sec, "sec", "s", config.GetSec(os.Getenv(env.SecBasePath)), "Sec base path on the local file system.")
+	cmd.Flags().StringVarP(&f.Cluster, "cluster", "c", "", "Cluster ID used for AWS and EKS resource naming.")
+	cmd.Flags().StringVarP(&f.KiaPath, "kia", "k", config.GetKia(os.Getenv(env.KiaBasePath)), "Kia base path on the local file system.")
+	cmd.Flags().StringVarP(&f.Region, "region", "r", "eu-central-1", "Region in which the EKS cluster gets created.")
+	cmd.Flags().StringVarP(&f.SecPath, "sec", "s", config.GetSec(os.Getenv(env.SecBasePath)), "Sec base path on the local file system.")
 }
 
 func (f *flag) Validate() error {
-	if f.Kia == "" {
+	if f.Cluster == "" {
+		return tracer.Maskf(invalidFlagError, "-c/--cluster must not be empty")
+	}
+
+	if f.KiaPath == "" {
 		return tracer.Maskf(invalidFlagError, "-k/--kia must not be empty")
 	}
 
-	if f.Sec == "" {
+	if f.Region == "" {
+		return tracer.Maskf(invalidFlagError, "-r/--region must not be empty")
+	}
+
+	if f.SecPath == "" {
 		return tracer.Maskf(invalidFlagError, "-s/--sec must not be empty")
 	}
 
