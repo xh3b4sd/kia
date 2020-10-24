@@ -1,14 +1,20 @@
 package eks
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"html/template"
+	"io"
+	"io/ioutil"
 	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/xh3b4sd/budget"
 	"github.com/xh3b4sd/logger"
 	"github.com/xh3b4sd/tracer"
 
@@ -36,15 +42,52 @@ func (r *runner) Run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func (r *runner) eksData() interface{} {
+	type AWS struct {
+		Region string
+	}
+
+	type Cluster struct {
+		Name string
+	}
+
+	type Data struct {
+		AWS     AWS
+		Cluster Cluster
+	}
+
+	return Data{
+		AWS: AWS{
+			Region: r.flag.Region,
+		},
+		Cluster: Cluster{
+			Name: r.flag.Cluster,
+		},
+	}
+}
+
 func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) error {
 	var err error
 	var out []byte
+
+	var b budget.Interface
+	{
+		c := budget.ConstantConfig{
+			Budget:   10,
+			Duration: 10 * time.Second,
+		}
+
+		b, err = budget.NewConstant(c)
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	secrets := map[string]string{}
 	{
 		r.logger.Log(ctx, "level", "info", "message", "decrypting local secrets")
 
-		out, err = exec.Command("red", "decrypt", "-i", mustAbs(r.flag.Sec), "-o", "-", "-s").CombinedOutput()
+		out, err = exec.Command("red", "decrypt", "-i", mustAbs(r.flag.SecPath), "-o", "-", "-s").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -55,10 +98,44 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		}
 	}
 
+	var eksYaml string
+	{
+		p := "env/eks/eksctl.yaml"
+
+		f, err := ioutil.ReadFile(mustAbs(r.flag.KiaPath, p))
+		if err != nil {
+			return tracer.Mask(err)
+		}
+
+		t, err := template.New(p).Parse(string(f))
+		if err != nil {
+			return tracer.Mask(err)
+		}
+
+		var b bytes.Buffer
+		err = t.ExecuteTemplate(&b, p, r.eksData())
+		if err != nil {
+			return tracer.Mask(err)
+		}
+
+		eksYaml = b.String()
+	}
+
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating eks cluster")
 
-		out, err = exec.Command("eksctl", "create", "cluster", "--config-file", mustAbs(r.flag.Kia, "env/eks/eksctl.yaml")).CombinedOutput()
+		cmd := exec.Command("eksctl", "create", "cluster", "-f", "-")
+
+		in, err := cmd.StdinPipe()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		io.WriteString(in, eksYaml)
+		in.Close()
+
+		out, err := cmd.CombinedOutput()
+
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -67,7 +144,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing service mesh")
 
-		out, err = exec.Command("istioctl", "install", "-f", mustAbs(r.flag.Kia, "env/eks/istio.yaml")).CombinedOutput()
+		out, err = exec.Command("istioctl", "install", "-f", mustAbs(r.flag.KiaPath, "env/eks/istio.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -98,7 +175,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"helm",
 			"install",
 			"infra",
-			mustAbs(r.flag.Kia, "env/def/infra/"),
+			mustAbs(r.flag.KiaPath, "env/def/infra/"),
 			"--namespace", "infra",
 			"--set", "dockerconfigjson="+mustDockerAuth(secrets),
 		).CombinedOutput()
@@ -107,11 +184,13 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		}
 	}
 
-	// TODO create Hosted Zone in Route53.
-	//
-	//     https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#set-up-a-hosted-zone
-	//
-	// Where to find chart documentation.
+	// Note that the following code requires a created Hosted Zone in Route53.
+	// This should usually be done during the process of domain registration and
+	// AWS account creation. A registrar might be Namecheap. A registered domain
+	// might be managed in Cloudflare. Some sub domain can then be delegated
+	// from Cloudflare to Route53 as such that NS records of AWS nameservers are
+	// configured in Cloudflare. For more information about external-dns chart
+	// we use below check the following resource.
 	//
 	//     https://artifacthub.io/packages/helm/bitnami/external-dns
 	//
@@ -143,7 +222,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"--set", "aws.credentials.accessKey="+secrets["aws.accessid"],
 			"--set", "aws.credentials.secretKey="+secrets["aws.secretid"],
 			"--set", "aws.region=eu-central-1",
-			"--set", "domainFilters={aws.venturemark.co}",
+			"--set", "domainFilters={"+secrets["aws.hostedzone"]+"}",
 			"--set", "provider=aws",
 			"--set", "sources={istio-gateway}",
 		).CombinedOutput()
@@ -187,14 +266,54 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing cert-asset chart")
 
+		var action string
+		var budget int
+
+		o := func() error {
+			defer func() { budget++ }()
+
+			if budget == 0 {
+				action = "install"
+			} else {
+				action = "upgrade"
+			}
+
+			out, err = exec.Command(
+				"helm",
+				action,
+				"cert-asset",
+				mustAbs(r.flag.KiaPath, "env/eks/cert-asset/"),
+				"--namespace", "cert-manager",
+				"--set", "aws.accessid="+secrets["aws.accessid"],
+				"--set", "aws.region="+r.flag.Region,
+				"--set", "aws.secretid="+secrets["aws.secretid"],
+			).CombinedOutput()
+			if err != nil {
+				return tracer.Maskf(executionFailedError, "%s", out)
+			}
+
+			return nil
+		}
+
+		err := b.Execute(o)
+		if err != nil {
+			return tracer.Mask(err)
+		}
+	}
+
+	// Istio assets like gateways and their corresponding certificates have to
+	// be installed once cert-manager is properly setup.
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing istio-asset chart")
+
 		out, err = exec.Command(
 			"helm",
 			"install",
-			"cert-asset",
-			mustAbs(r.flag.Kia, "env/eks/cert-asset/"),
-			"--namespace", "cert-manager",
-			"--set", "aws.accessid="+secrets["aws.accessid"],
-			"--set", "aws.secretid="+secrets["aws.secretid"],
+			"istio-asset",
+			mustAbs(r.flag.KiaPath, "env/eks/istio-asset/"),
+			"--namespace", "istio-system",
+			"--set", "cluster.domain="+secrets["aws.hostedzone"],
+			"--set", "cluster.name="+r.flag.Cluster,
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
