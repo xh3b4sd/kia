@@ -190,8 +190,8 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	// Note that the following code requires a created Hosted Zone in Route53.
 	// This should usually be done during the process of domain registration and
 	// AWS account creation. A registrar might be Namecheap. A registered domain
-	// might be managed in Cloudflare. Some sub domain can then be delegated
-	// from Cloudflare to Route53 as such that NS records of AWS nameservers are
+	// might be managed in Cloudflare. Some subdomain can then be delegated from
+	// Cloudflare to Route53 as such that NS records of AWS nameservers are
 	// configured in Cloudflare. For more information about external-dns chart
 	// we use below check the following resource.
 	//
@@ -224,8 +224,9 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"--version", "v3.4.9",
 			"--set", "aws.credentials.accessKey="+secrets["aws.accessid"],
 			"--set", "aws.credentials.secretKey="+secrets["aws.secretid"],
-			"--set", "aws.region=eu-central-1",
+			"--set", "aws.region="+r.flag.Region,
 			"--set", "domainFilters={"+secrets["aws.hostedzone"]+"}",
+			"--set", "policy=sync",
 			"--set", "provider=aws",
 			"--set", "sources={istio-gateway}",
 		).CombinedOutput()
@@ -315,8 +316,8 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"istio-asset",
 			mustAbs(r.flag.KiaPath, "env/eks/istio-asset/"),
 			"--namespace", "istio-system",
-			"--set", "cluster.domain="+secrets["aws.hostedzone"],
 			"--set", "cluster.name="+r.flag.Cluster,
+			"--set", "cluster.zone="+secrets["aws.hostedzone"],
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
