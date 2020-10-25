@@ -1,7 +1,8 @@
-package create
+package osx
 
 import (
 	"context"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 	"github.com/xh3b4sd/logger"
@@ -24,9 +25,16 @@ func (r *runner) Run(cmd *cobra.Command, args []string) error {
 }
 
 func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) error {
-	err := cmd.Help()
-	if err != nil {
-		return tracer.Mask(err)
+	var err error
+	var out []byte
+
+	{
+		r.logger.Log(ctx, "level", "info", "message", "deleting kind cluster")
+
+		out, err = exec.Command("kind", "delete", "cluster").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
 	}
 
 	return nil

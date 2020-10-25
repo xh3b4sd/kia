@@ -7,6 +7,7 @@ import (
 
 	"github.com/xh3b4sd/kia/cmd/completion"
 	"github.com/xh3b4sd/kia/cmd/create"
+	"github.com/xh3b4sd/kia/cmd/delete"
 	"github.com/xh3b4sd/kia/cmd/version"
 	"github.com/xh3b4sd/kia/pkg/project"
 )
@@ -52,6 +53,18 @@ func New(config Config) (*cobra.Command, error) {
 		}
 	}
 
+	var deleteCmd *cobra.Command
+	{
+		c := delete.Config{
+			Logger: config.Logger,
+		}
+
+		deleteCmd, err = delete.New(c)
+		if err != nil {
+			return nil, tracer.Mask(err)
+		}
+	}
+
 	var versionCmd *cobra.Command
 	{
 		c := version.Config{
@@ -85,6 +98,7 @@ func New(config Config) (*cobra.Command, error) {
 
 		c.AddCommand(completionCmd)
 		c.AddCommand(createCmd)
+		c.AddCommand(deleteCmd)
 		c.AddCommand(versionCmd)
 	}
 
