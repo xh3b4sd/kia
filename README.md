@@ -82,3 +82,33 @@ Flags:
   -r, --region string    Region in which the EKS cluster gets created. (default "eu-central-1")
   -s, --sec string       Sec base path on the local file system. (default "~/projects/xh3b4sd/sec")
 ```
+
+
+
+### Cluster Deletion
+
+```
+$ kia delete eks -h
+Delete kubernetes infrastructure environments for eks. The deletion process
+is mostly straight forward since eks takes care of most of the cloud provider
+resources managed in aws. For now there is only one caveat to be aware of. We
+use istio gateways and external-dns to register DNS records in Route53. In
+order to cleanup the cluster specific DNS records we need to delete the
+istio-asset chart first and let external-dns take care of the cleanup
+procedure. For now the mechanism is purely time based, which means we just
+wait for 5 minutes. This implies the cleanup might fail and we proceed
+deleting the cluster regardless, leaving behind Route53 DNS records.
+
+    $ kia delete eks -c kia02
+    { "caller":"github.com/xh3b4sd/kia/cmd/delete/eks/runner.go:39", "level":"info", "message":"deleting istio-asset chart", "time":"2020-10-25 13:27:37" }
+    { "caller":"github.com/xh3b4sd/kia/cmd/delete/eks/runner.go:55", "level":"info", "message":"waiting for cleanup", "time":"2020-10-25 13:27:39" }
+    { "caller":"github.com/xh3b4sd/kia/cmd/delete/eks/runner.go:61", "level":"info", "message":"deleting cert-asset chart", "time":"2020-10-25 13:32:39" }
+    { "caller":"github.com/xh3b4sd/kia/cmd/delete/eks/runner.go:70", "level":"info", "message":"deleting eks cluster", "time":"2020-10-25 13:32:42" }
+
+Usage:
+  kia delete eks [flags]
+
+Flags:
+  -c, --cluster string   Cluster ID used for AWS and EKS resource naming.
+  -h, --help             help for eks
+```

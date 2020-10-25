@@ -54,9 +54,10 @@ number.
 
 After some time the cluster created as shown above would be available
 depending on the Route53 hosted zone configured in the secret data
-repository.
+repository. Some api server deployed in the created cluster would be
+available like shown below.
 
-    kia02.aws.example.com
+    apiserver.kia02.aws.example.com
 `
 )
 
