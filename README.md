@@ -19,6 +19,22 @@ General non sensitive configuration is stored in the `env` directory.
 
 
 
+### Project Configuration
+
+Managing clusters across different environments requires `kia` to know where its
+own assets are and where to find secret data. The latter is managed via the
+`red` command line tool. See https://github.com/xh3b4sd/red for more
+information. Below is shown the expected config file location on your file
+system including the two required keys and their associated values.
+
+```
+$ cat ~/.config/kia/config.yaml
+kia: "~/projects/xh3b4sd/kia"
+sec: "~/projects/xh3b4sd/sec"
+```
+
+
+
 ### Cluster Creation
 
 ```
