@@ -37,11 +37,14 @@ func (r *runner) Run(cmd *cobra.Command, args []string) error {
 }
 
 func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) error {
+	var err error
+	var out []byte
+
 	secrets := map[string]string{}
 	{
 		r.logger.Log(ctx, "level", "info", "message", "decrypting local secrets")
 
-		out, err := exec.Command("red", "decrypt", "-i", mustAbs(r.flag.Sec), "-o", "-", "-s").CombinedOutput()
+		out, err = exec.Command("red", "decrypt", "-i", mustAbs(r.flag.SecPath), "-o", "-", "-s").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -55,7 +58,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating kind cluster")
 
-		out, err := exec.Command("kind", "create", "cluster", "--config", mustAbs(r.flag.Kia, "env/osx/kind.yaml")).CombinedOutput()
+		out, err = exec.Command("kind", "create", "cluster", "--config", mustAbs(r.flag.KiaPath, "env/osx/kind.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -64,7 +67,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing service mesh")
 
-		out, err := exec.Command("istioctl", "install", "-f", mustAbs(r.flag.Kia, "env/osx/istio.yaml")).CombinedOutput()
+		out, err = exec.Command("istioctl", "install", "-f", mustAbs(r.flag.KiaPath, "env/osx/istio.yaml")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -73,7 +76,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating infra namespace")
 
-		out, err := exec.Command("kubectl", "create", "namespace", "infra").CombinedOutput()
+		out, err = exec.Command("kubectl", "create", "namespace", "infra").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -82,7 +85,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "configure istio injection")
 
-		out, err := exec.Command("kubectl", "label", "namespace", "infra", "istio-injection=enabled").CombinedOutput()
+		out, err = exec.Command("kubectl", "label", "namespace", "infra", "istio-injection=enabled").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -91,7 +94,22 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing infra chart")
 
-		out, err := exec.Command("helm", "-n", "infra", "install", "infra", mustAbs(r.flag.Kia, "env/def/infra/"), "--set", "dockerconfigjson="+mustAuth(secrets)).CombinedOutput()
+		out, err = exec.Command("helm", "-n", "infra", "install", "infra", mustAbs(r.flag.KiaPath, "env/def/infra/"), "--set", "dockerconfigjson="+mustAuth(secrets)).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing istio-asset chart")
+
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"istio-asset",
+			mustAbs(r.flag.KiaPath, "env/osx/istio-asset/"),
+			"--namespace", "istio-system",
+		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}

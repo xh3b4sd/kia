@@ -13,7 +13,7 @@ spec:
               patches:
                 - path: "spec.ports[4]"
                   value:
-                    name: "grpc"
+                    name: "grpc-web"
                     nodePort: 30007
                     port: 30007
                     targetPort: 7777

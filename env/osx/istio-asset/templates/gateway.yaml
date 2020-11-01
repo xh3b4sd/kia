@@ -1,0 +1,16 @@
+apiVersion: "networking.istio.io/v1beta1"
+kind: "Gateway"
+metadata:
+  name: "ingressgateway"
+  labels:
+    app.kubernetes.io/name: "{{ .Release.Name }}"
+spec:
+  selector:
+    istio: "ingressgateway"
+  servers:
+    - port:
+        name: "grpc-web"
+        number: 30007
+        protocol: "GRPC"
+      hosts:
+        - "*"

@@ -11,21 +11,21 @@ import (
 )
 
 type flag struct {
-	Kia string
-	Sec string
+	KiaPath string
+	SecPath string
 }
 
 func (f *flag) Init(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&f.Kia, "kia", "k", config.GetKia(os.Getenv(env.KiaBasePath)), "Kia base path on the local file system.")
-	cmd.Flags().StringVarP(&f.Sec, "sec", "s", config.GetSec(os.Getenv(env.SecBasePath)), "Sec base path on the local file system.")
+	cmd.Flags().StringVarP(&f.KiaPath, "kia", "k", config.GetKia(os.Getenv(env.KiaBasePath)), "Kia base path on the local file system.")
+	cmd.Flags().StringVarP(&f.SecPath, "sec", "s", config.GetSec(os.Getenv(env.SecBasePath)), "Sec base path on the local file system.")
 }
 
 func (f *flag) Validate() error {
-	if f.Kia == "" {
+	if f.KiaPath == "" {
 		return tracer.Maskf(invalidFlagError, "-k/--kia must not be empty")
 	}
 
-	if f.Sec == "" {
+	if f.SecPath == "" {
 		return tracer.Maskf(invalidFlagError, "-s/--sec must not be empty")
 	}
 
