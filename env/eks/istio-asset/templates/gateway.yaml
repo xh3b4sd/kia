@@ -13,6 +13,13 @@ spec:
         number: 443
         protocol: "HTTPS"
       hosts:
+        # In a remote setup using eks the istio ingress gateway forwards traffic
+        # based on wildcard expressions of a hosted zone. This allows virtual
+        # services to specific subdomains of their micro services according to
+        # the cluster name and DNS zone.
+        #
+        #     *.kia02.aws.example.com
+        #
         - "*.{{ .Values.cluster.name }}.{{ .Values.cluster.zone }}"
       tls:
         mode: "SIMPLE"

@@ -4,6 +4,18 @@ name: "kind"
 nodes:
 - role: "control-plane"
   extraPortMappings:
+    # The apiclient web app is available through this port on the host machine.
+    #
+    #     http://127.0.0.1:3000
+    #
+    - containerPort: 30003
+      hostPort: 3000
+      listenAddress: "127.0.0.1"
+    # The apiserver backend service is available through this port on the host
+    # machine.
+    #
+    #     http://127.0.0.1:7777
+    #
     - containerPort: 30007
       hostPort: 7777
       listenAddress: "127.0.0.1"
