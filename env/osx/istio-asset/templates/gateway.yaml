@@ -8,8 +8,26 @@ spec:
   selector:
     istio: "ingressgateway"
   servers:
+    # This port is reserved for the apiclient. For more information see the
+    # following files.
+    #
+    #     ./env/osx/istio.yaml
+    #     ./env/osx/kind.yaml
+    #
     - port:
-        name: "grpc-web"
+        name: "apiclient"
+        number: 30003
+        protocol: "HTTP"
+      hosts:
+        - "*"
+    # This port is reserved for the apiserver. For more information see the
+    # following files.
+    #
+    #     ./env/osx/istio.yaml
+    #     ./env/osx/kind.yaml
+    #
+    - port:
+        name: "apiserver"
         number: 30007
         protocol: "GRPC"
       hosts:

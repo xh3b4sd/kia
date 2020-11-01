@@ -11,9 +11,27 @@ spec:
               kind: "Service"
               name: "istio-ingressgateway"
               patches:
+                # The apiclient port mapping works as follows.
+                #
+                #      osx        |                container                |        k8s
+                #
+                #     :3000    <----->    :30003    <----->    :30003    <----->    :3000
+                #
                 - path: "spec.ports[4]"
                   value:
-                    name: "grpc-web"
+                    name: "apiclient"
+                    nodePort: 30003
+                    port: 30003
+                    targetPort: 3000
+                # The apiserver port mapping works as follows.
+                #
+                #      osx        |                container                |        k8s
+                #
+                #     :7777    <----->    :30007    <----->    :30007    <----->    :7777
+                #
+                - path: "spec.ports[5]"
+                  value:
+                    name: "apiserver"
                     nodePort: 30007
                     port: 30007
                     targetPort: 7777
