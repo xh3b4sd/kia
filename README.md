@@ -21,16 +21,36 @@ General non sensitive configuration is stored in the `env` directory.
 
 ### Project Configuration
 
-Managing clusters across different environments requires `kia` to know where its
-own assets are and where to find secret data. The latter is managed via the
-`red` command line tool. See https://github.com/xh3b4sd/red for more
-information. Below is shown the expected config file location on your file
-system including the two required keys and their associated values.
-
 ```
-$ cat ~/.config/kia/config.yaml
-kia: "~/projects/xh3b4sd/kia"
-sec: "~/projects/xh3b4sd/sec"
+$ kia update org -h
+Update the current organization name. Managing clusters for different
+organizations requires kia to know where its own assets are and where to find
+secret data. The latter is managed via the red command line tool. See
+https://github.com/xh3b4sd/red for more information. Below is shown the
+expected config file location on your file system, including the required
+structure and its associated values.
+
+    $ cat ~/.config/kia/config.yaml
+    kia: "~/projects/xh3b4sd/kia"
+    org:
+      list:
+        - org: "xh3b4sd"
+          sec: "~/projects/xh3b4sd/sec"
+        - org: "yourorg"
+          sec: "~/projects/yourorg/sec"
+	  selected: "xh3b4sd"
+
+Given the example config file above the organization used by kia can be
+changed as shown below.
+
+    kia update org --selected yourorg
+
+Usage:
+  kia update org [flags]
+
+Flags:
+  -h, --help              help for org
+      --selected string   Select the given organization for current use.
 ```
 
 
