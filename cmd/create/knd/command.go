@@ -1,4 +1,4 @@
-package osx
+package knd
 
 import (
 	"github.com/spf13/cobra"
@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	name  = "osx"
-	short = "Create kubernetes infrastructure environments for osx."
-	long  = `Create kubernetes infrastructure environments for osx. The basis for this
+	name  = "knd"
+	short = "Create kubernetes infrastructure environments for kind."
+	long  = `Create kubernetes infrastructure environments for kind. The basis for this
 type of environment is a local kind cluster. Kind stands for kubernetes in
 docker. For more information check the kind repository.
 

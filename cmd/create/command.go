@@ -6,13 +6,13 @@ import (
 	"github.com/xh3b4sd/tracer"
 
 	"github.com/xh3b4sd/kia/cmd/create/eks"
-	"github.com/xh3b4sd/kia/cmd/create/osx"
+	"github.com/xh3b4sd/kia/cmd/create/knd"
 )
 
 const (
 	name  = "create"
-	short = "Create kubernetes infrastructure environments for e.g. eks and osx."
-	long  = "Create kubernetes infrastructure environments for e.g. eks and osx."
+	short = "Create kubernetes infrastructure environments for e.g. eks and knd."
+	long  = "Create kubernetes infrastructure environments for e.g. eks and knd."
 )
 
 type Config struct {
@@ -38,13 +38,13 @@ func New(config Config) (*cobra.Command, error) {
 		}
 	}
 
-	var osxCmd *cobra.Command
+	var kndCmd *cobra.Command
 	{
-		c := osx.Config{
+		c := knd.Config{
 			Logger: config.Logger,
 		}
 
-		osxCmd, err = osx.New(c)
+		kndCmd, err = knd.New(c)
 		if err != nil {
 			return nil, tracer.Mask(err)
 		}
@@ -64,7 +64,7 @@ func New(config Config) (*cobra.Command, error) {
 		}
 
 		c.AddCommand(eksCmd)
-		c.AddCommand(osxCmd)
+		c.AddCommand(kndCmd)
 	}
 
 	return c, nil

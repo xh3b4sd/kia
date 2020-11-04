@@ -1,4 +1,4 @@
-package osx
+package knd
 
 import (
 	"github.com/spf13/cobra"
@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	name  = "osx"
-	short = "Delete kubernetes infrastructure environments for osx."
-	long  = "Delete kubernetes infrastructure environments for osx."
+	name  = "knd"
+	short = "Delete kubernetes infrastructure environments for kind."
+	long  = "Delete kubernetes infrastructure environments for kind."
 )
 
 type Config struct {
