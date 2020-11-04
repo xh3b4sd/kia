@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	"github.com/xh3b4sd/kia/pkg/config"
 	"github.com/xh3b4sd/logger"
 	"github.com/xh3b4sd/tracer"
+
+	"github.com/xh3b4sd/kia/pkg/config"
 )
 
 type runner struct {
