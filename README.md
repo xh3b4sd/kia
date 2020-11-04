@@ -13,7 +13,7 @@ General non sensitive configuration is stored in the `env` directory.
   infrastructure provider they are applied to.
 * `env/eks` contains all templates applied to the cloud provider AWS. The
   patches configured here should reliable work for EKS on AWS.
-* `env/osx` contains all templates applied to local machines running on darwin
+* `env/knd` contains all templates applied to local machines running on darwin
   architectures. The patches configured here should reliable work for Kind
   containers.
 

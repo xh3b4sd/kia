@@ -11,8 +11,8 @@ spec:
     # This port is reserved for the apiclient. For more information see the
     # following files.
     #
-    #     ./env/osx/istio.yaml
-    #     ./env/osx/kind.yaml
+    #     ./env/knd/istio.yaml
+    #     ./env/knd/kind.yaml
     #
     - port:
         name: "apiclient"
@@ -23,8 +23,8 @@ spec:
     # This port is reserved for the apiserver. For more information see the
     # following files.
     #
-    #     ./env/osx/istio.yaml
-    #     ./env/osx/kind.yaml
+    #     ./env/knd/istio.yaml
+    #     ./env/knd/kind.yaml
     #
     - port:
         name: "apiserver"
