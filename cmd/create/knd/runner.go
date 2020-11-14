@@ -115,6 +115,32 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		}
 	}
 
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing redis chart")
+
+		out, err = exec.Command("kubectl", "create", "namespace", "redis").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command("helm", "repo", "add", "bitnami", "https://charts.bitnami.com/bitnami").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"redis",
+			"bitnami/redis",
+			"--namespace", "redis",
+			"--set", "cluster.enabled=false",
+		).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
 	return nil
 }
 
