@@ -8,6 +8,7 @@ import (
 
 	"github.com/xh3b4sd/kia/pkg/config"
 	"github.com/xh3b4sd/kia/pkg/env"
+	"github.com/xh3b4sd/kia/pkg/file"
 )
 
 type flag struct {
@@ -21,12 +22,24 @@ func (f *flag) Init(cmd *cobra.Command) {
 }
 
 func (f *flag) Validate() error {
-	if f.KiaPath == "" {
-		return tracer.Maskf(invalidFlagError, "-k/--kia must not be empty")
+	{
+		if f.KiaPath == "" {
+			return tracer.Maskf(invalidFlagError, "-k/--kia must not be empty")
+		}
+
+		if !file.Exists(f.KiaPath) {
+			return tracer.Maskf(invalidFlagError, "-k/--kia path does not exist")
+		}
 	}
 
-	if f.SecPath == "" {
-		return tracer.Maskf(invalidFlagError, "-s/--sec must not be empty")
+	{
+		if f.SecPath == "" {
+			return tracer.Maskf(invalidFlagError, "-s/--sec must not be empty")
+		}
+
+		if !file.Exists(f.SecPath) {
+			return tracer.Maskf(invalidFlagError, "-s/--sec path does not exist")
+		}
 	}
 
 	return nil

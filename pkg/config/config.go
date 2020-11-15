@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/xh3b4sd/tracer"
@@ -73,24 +72,14 @@ func Select(org string) Config {
 
 func Validate(c Config) error {
 	{
-		abs, err := filepath.Abs(strings.TrimPrefix(c.Kia, "~/"))
-		if err != nil {
-			return tracer.Mask(err)
-		}
-
-		if !file.Exists(abs) {
+		if !file.Exists(c.Kia) {
 			return tracer.Maskf(invalidConfigError, "config.kia is %#q but there does no such file exist on the file system", c.Kia)
 		}
 	}
 
 	{
 		for n, i := range c.Org.List {
-			abs, err := filepath.Abs(strings.TrimPrefix(i.Sec, "~/"))
-			if err != nil {
-				return tracer.Mask(err)
-			}
-
-			if !file.Exists(abs) {
+			if !file.Exists(i.Sec) {
 				return tracer.Maskf(invalidConfigError, "config.org.list[%d].sec is %#q but there does no such file exist on the file system", n, i.Sec)
 			}
 		}
