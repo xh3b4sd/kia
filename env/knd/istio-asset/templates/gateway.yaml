@@ -8,14 +8,14 @@ spec:
   selector:
     istio: "ingressgateway"
   servers:
-    # This port is reserved for the apiclient. For more information see the
+    # This port is reserved for the webclient. For more information see the
     # following files.
     #
     #     ./env/knd/istio.yaml
     #     ./env/knd/kind.yaml
     #
     - port:
-        name: "apiclient"
+        name: "webclient"
         number: 30003
         protocol: "HTTP"
       hosts:

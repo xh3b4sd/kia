@@ -4,7 +4,7 @@ name: "kind"
 nodes:
 - role: "control-plane"
   extraPortMappings:
-    # The apiclient web app is available through this port on the host machine.
+    # The webclient web app is available through this port on the host machine.
     #
     #     http://127.0.0.1:3000
     #

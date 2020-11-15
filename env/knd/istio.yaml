@@ -11,7 +11,7 @@ spec:
               kind: "Service"
               name: "istio-ingressgateway"
               patches:
-                # The apiclient port mapping works as follows.
+                # The webclient port mapping works as follows.
                 #
                 #      host       |                container                |        k8s
                 #
@@ -19,7 +19,7 @@ spec:
                 #
                 - path: "spec.ports[4]"
                   value:
-                    name: "apiclient"
+                    name: "webclient"
                     nodePort: 30003
                     port: 30003
                     targetPort: 3000
@@ -35,3 +35,5 @@ spec:
                     nodePort: 30007
                     port: 30007
                     targetPort: 7777
+  meshConfig:
+    accessLogFile: /dev/stdout

@@ -80,10 +80,6 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
-	}
-
-	{
-		r.logger.Log(ctx, "level", "info", "message", "configure istio injection")
 
 		out, err = exec.Command("kubectl", "label", "namespace", "infra", "istio-injection=enabled").CombinedOutput()
 		if err != nil {
@@ -109,6 +105,28 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"istio-asset",
 			mustAbs(r.flag.KiaPath, "env/knd/istio-asset/"),
 			"--namespace", "istio-system",
+		).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing redis chart")
+
+		out, err = exec.Command("helm", "repo", "add", "bitnami", "https://charts.bitnami.com/bitnami").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"redis",
+			"bitnami/redis",
+			"--namespace", "infra",
+			"--set", "cluster.enabled=false",
+			"--set", "usePassword=false",
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)

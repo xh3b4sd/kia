@@ -24,7 +24,7 @@ structure and its associated values.
           sec: "~/projects/xh3b4sd/sec"
         - org: "yourorg"
           sec: "~/projects/yourorg/sec"
-	  selected: "xh3b4sd"
+      selected: "xh3b4sd"
 
 Given the example config file above the organization used by kia can be
 changed as shown below.
