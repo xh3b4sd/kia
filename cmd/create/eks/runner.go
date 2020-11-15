@@ -160,10 +160,6 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
-	}
-
-	{
-		r.logger.Log(ctx, "level", "info", "message", "configure istio injection")
 
 		out, err = exec.Command("kubectl", "label", "namespace", "infra", "istio-injection=enabled").CombinedOutput()
 		if err != nil {
