@@ -6,6 +6,14 @@ import (
 	"github.com/xh3b4sd/tracer"
 )
 
+var binaryNotFoundError = &tracer.Error{
+	Kind: "binaryNotFoundError",
+}
+
+func IsBinaryNotFound(err error) bool {
+	return errors.Is(err, binaryNotFoundError)
+}
+
 var executionFailedError = &tracer.Error{
 	Kind: "executionFailedError",
 }
