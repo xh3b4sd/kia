@@ -8,14 +8,38 @@ Opinionated kubernetes infrastructure automation.
 
 General non sensitive configuration is stored in the `env` directory.
 
-* `env/def` contains all templates applied to all kubernetes environments. The
+- `env/def` contains all templates applied to all kubernetes environments. The
   defaults configured here should reliable work regardless the underlying
   infrastructure provider they are applied to.
-* `env/eks` contains all templates applied to the cloud provider AWS. The
+- `env/eks` contains all templates applied to the cloud provider AWS. The
   patches configured here should reliable work for EKS on AWS.
-* `env/knd` contains all templates applied to local machines running on darwin
+- `env/knd` contains all templates applied to local machines running on darwin
   architectures. The patches configured here should reliable work for Kind
   containers.
+
+
+
+### Project Installation
+
+```
+go get github.com/xh3b4sd/kia
+```
+
+
+
+### Project Prerequisites
+
+- [aws] CLI for working with AWS and EKS clusters
+- [aws-iam-authenticator] for AWS authentication
+- [docker] for local setup using `kind`
+- [eksctl] for working with AWS and EKS clusters
+- [golang] for installation of `kia` and `red` installation
+- [grpcurl] for playing with grpc apis
+- [helm] for deploying applications into kubernetes clusters
+- [istioctl] for setting up the service mesh within kubernetes clusters
+- [kind] for working with kubernetes clusters locally
+- [kubectl] for working with the kubernetes api
+- [red] for managing secret data
 
 
 
@@ -148,3 +172,17 @@ Flags:
   -c, --cluster string   Cluster ID used for AWS and EKS resource naming.
   -h, --help             help for eks
 ```
+
+
+
+[aws]: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+[aws-iam-authenticator]: https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
+[docker]: https://www.docker.com/get-started
+[eksctl]: https://eksctl.io
+[golang]: https://github.com/moovweb/gvm
+[grpcurl]: https://github.com/fullstorydev/grpcurl
+[helm]: https://helm.sh/docs/intro/install
+[istioctl]: https://istio.io/latest/docs/reference/commands/istioctl
+[kind]: https://kind.sigs.k8s.io
+[kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl
+[red]: https://github.com/xh3b4sd/red
