@@ -39,11 +39,22 @@ go get github.com/xh3b4sd/kia
 - [istioctl] for setting up the service mesh within kubernetes clusters
 - [kind] for working with kubernetes clusters locally
 - [kubectl] for working with the kubernetes api
-- [red] for managing secret data
+- [red] for secret data management
 
 
 
 ### Project Configuration
+
+- https://github.com/xh3b4sd/kia as of now needs to be cloned on your machine in
+  order to find cluster specific configuration, because `kia` needs these files
+  when you execute the command line tool. That is why the location of the
+  repository needs to be configured in the kia config file as shown below.
+- https://github.com/xh3b4sd/sec is an example repository containing secret
+  data. You need to create your own. As of now this repository that you create
+  for your own environment needs to be cloned on your machine in order to find
+  cluster specific secrets, because `kia` needs these files when you execute the
+  command line tool. That is why the location of the repository needs to be
+  configured in the kia config file as shown below.
 
 ```
 $ kia update org -h
@@ -55,13 +66,13 @@ expected config file location on your file system, including the required
 structure and its associated values.
 
     $ cat ~/.config/kia/config.yaml
-    kia: "~/projects/xh3b4sd/kia"
+    kia: "~/projects/xh3b4sd/kia/"
     org:
       list:
         - org: "xh3b4sd"
-          sec: "~/projects/xh3b4sd/sec"
+          sec: "~/projects/xh3b4sd/sec/"
         - org: "yourorg"
-          sec: "~/projects/yourorg/sec"
+          sec: "~/projects/yourorg/sec/"
 	  selected: "xh3b4sd"
 
 Given the example config file above the organization used by kia can be
