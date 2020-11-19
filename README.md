@@ -1,6 +1,6 @@
 # kia
 
-Opinionated kubernetes infrastructure automation.
+Opinionated Kubernetes infrastructure automation.
 
 
 
@@ -8,7 +8,7 @@ Opinionated kubernetes infrastructure automation.
 
 General non sensitive configuration is stored in the `env` directory.
 
-- `env/def` contains all templates applied to all kubernetes environments. The
+- `env/def` contains all templates applied to all Kubernetes environments. The
   defaults configured here should reliable work regardless the underlying
   infrastructure provider they are applied to.
 - `env/eks` contains all templates applied to the cloud provider AWS. The
@@ -29,17 +29,34 @@ go get github.com/xh3b4sd/kia
 
 ### Project Prerequisites
 
-- [aws] CLI for working with AWS and EKS clusters
-- [aws-iam-authenticator] for AWS authentication
-- [docker] for local setup using `kind`
-- [eksctl] for working with AWS and EKS clusters
-- [golang] for installation of `kia` and `red` installation
-- [grpcurl] for playing with grpc apis
-- [helm] for deploying applications into kubernetes clusters
-- [istioctl] for setting up the service mesh within kubernetes clusters
-- [kind] for working with kubernetes clusters locally
-- [kubectl] for working with the kubernetes api
-- [red] for secret data management
+- [aws] CLI for working with AWS and EKS clusters. Make sure to have your
+  credentials set up according to the AWS account you want to use if you intend
+  to work with EKS clusters.
+- [aws-iam-authenticator] for AWS authentication. `eksctl` is using this tool
+  under the hood in order to generate kube configs for your EKS cluster.
+- [docker] for local setup using `kind`. Make sure to upper the RAM that Docker
+  is allowed to use. You will need at least 4GB in order to get the local
+  environment using Kind up and running.
+- [eksctl] for working with AWS and EKS clusters. `kia` uses that to create EKS
+  clusters. A config file is provided when creating the EKS cluster.
+- [golang] for installation of `kia` and `red` on your machine. You will also
+  need go if you intend to develop the project further.
+- [grpcurl] for playing with gRPC apis. Always useful to have when working with
+  gRPC so that requests can be made and responses can be inspected.
+- [helm] for deploying applications into Kubernetes clusters. Anything deployed
+  to a Kubernetes cluster should be packaged as a Helm chart.
+- [istioctl] for setting up the service mesh within Kubernetes clusters. Does
+  also provide Envoy as ingress controller which proxies grpc-web for frontend
+  applications.
+- [kind] for working with Kubernetes clusters locally. Necessary to get a
+  "production like" environment on your machine. See the `docker` section above
+  for eventual RAM issues.
+- [kubectl] for working with the Kubernetes api. Used under the hood by `kia`.
+  Also always useful to get around the Kubernetes cluster. You want to check
+  runtime objects like pods and scale deployments.
+- [red] for secret data management. Also see the project configuration section
+  below. You may need to understand the file structure of the `sec` repository
+  if you want to manage your own secret data.
 
 
 
