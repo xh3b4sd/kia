@@ -58,6 +58,19 @@ repository. Some api server deployed in the created cluster would be
 available like shown below.
 
     apiserver.kia02.aws.example.com
+
+Executing this command has several requirements to be satisfied in order to
+function correctly. The following tools need to be installed and accessible
+in the program's path.
+
+    aws                      https://aws.amazon.com/cli
+    aws-iam-authenticator    https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
+    eksctl                   https://eksctl.io
+    flux                     https://fluxcd.io
+    helm                     https://helm.sh
+    istioctl                 https://istio.io
+    kubectl                  https://kubernetes.io/docs/tasks/tools/install-kubectl
+    red                      https://github.com/xh3b4sd/red
 `
 )
 
@@ -79,6 +92,7 @@ func New(config Config) (*cobra.Command, error) {
 					"aws",
 					"aws-iam-authenticator",
 					"eksctl",
+					"flux",
 					"helm",
 					"istioctl",
 					"kubectl",

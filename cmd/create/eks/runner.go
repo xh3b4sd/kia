@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
@@ -324,6 +325,29 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
+	}
+
+	{
+		r.logger.Log(ctx, "level", "info", "message", "installing flux toolkit")
+
+		os.Setenv("GITHUB_TOKEN", secrets["github.flux.token"])
+
+		out, err = exec.Command(
+			"flux",
+			"bootstrap",
+			"github",
+			"--owner",
+			"venturemark",
+			"--repository",
+			"flux",
+			"--token-auth",
+			"true",
+		).CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
+		os.Unsetenv("GITHUB_TOKEN")
 	}
 
 	return nil

@@ -28,6 +28,18 @@ from which secret data is read. Add the following line to your config file
 according to your local setup.
 
     sec: "~/project/xh3b4sd/sec/"
+
+Executing this command has several requirements to be satisfied in order to
+function correctly. The following tools need to be installed and accessible
+in the program's path.
+
+    docker      https://www.docker.com
+    flux        https://fluxcd.io
+    helm        https://helm.sh
+    istioctl    https://istio.io
+    kind        https://kind.sigs.k8s.io
+    kubectl     https://kubernetes.io/docs/tasks/tools/install-kubectl
+    red         https://github.com/xh3b4sd/red
 `
 )
 
@@ -47,6 +59,7 @@ func New(config Config) (*cobra.Command, error) {
 			path: &path{
 				Binary: []string{
 					"docker",
+					"flux",
 					"helm",
 					"istioctl",
 					"kind",
