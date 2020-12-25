@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -332,12 +333,19 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 
 		os.Setenv("GITHUB_TOKEN", secrets["github.flux.token"])
 
+		u, err := user.Current()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+
 		out, err = exec.Command(
 			"flux",
 			"bootstrap",
 			"github",
 			"--owner",
 			"venturemark",
+			"--path",
+			fmt.Sprintf("eks-%s-%s", u.Username, r.flag.Cluster),
 			"--repository",
 			"flux",
 			"--token-auth",
