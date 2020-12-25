@@ -12,16 +12,24 @@ import (
 )
 
 type flag struct {
+	Cluster string
 	KiaPath string
 	SecPath string
 }
 
 func (f *flag) Init(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&f.Cluster, "cluster", "c", "kind", "Cluster ID of the Kind cluster.")
 	cmd.Flags().StringVarP(&f.KiaPath, "kia", "k", config.GetKia(os.Getenv(env.KiaBasePath)), "Kia base path on the local file system.")
 	cmd.Flags().StringVarP(&f.SecPath, "sec", "s", config.GetSec(os.Getenv(env.SecBasePath)), "Sec base path on the local file system.")
 }
 
 func (f *flag) Validate() error {
+	{
+		if f.Cluster == "" {
+			return tracer.Maskf(invalidFlagError, "-c/--cluster must not be empty")
+		}
+	}
+
 	{
 		if f.KiaPath == "" {
 			return tracer.Maskf(invalidFlagError, "-k/--kia must not be empty")
