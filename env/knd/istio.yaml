@@ -35,5 +35,20 @@ spec:
                     nodePort: 30007
                     port: 30007
                     targetPort: 7777
+  components:
+    pilot:
+      k8s:
+        # We limit the resources istiod consumes in the local setup. The pilot
+        # component configures e.g. the istiod deployment, for whatever reason.
+        # So during development it should not be necessary to allocate 2GB by
+        # default, because that would just steal resources unnecessarily from
+        # all the other pods we have to run.
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "500Mi"
+          requests:
+            cpu: "200m"
+            memory: "500Mi"
   meshConfig:
     accessLogFile: /dev/stdout
