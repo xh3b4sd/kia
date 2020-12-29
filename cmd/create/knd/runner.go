@@ -120,28 +120,6 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	}
 
 	{
-		r.logger.Log(ctx, "level", "info", "message", "installing redis chart")
-
-		out, err = exec.Command("helm", "repo", "add", "bitnami", "https://charts.bitnami.com/bitnami").CombinedOutput()
-		if err != nil {
-			return tracer.Maskf(executionFailedError, "%s", out)
-		}
-
-		out, err = exec.Command(
-			"helm",
-			"install",
-			"redis",
-			"bitnami/redis",
-			"--namespace", "infra",
-			"--set", "cluster.enabled=false",
-			"--set", "usePassword=false",
-		).CombinedOutput()
-		if err != nil {
-			return tracer.Maskf(executionFailedError, "%s", out)
-		}
-	}
-
-	{
 		r.logger.Log(ctx, "level", "info", "message", "installing flux toolkit")
 
 		os.Setenv("GITHUB_TOKEN", secrets["github.flux.token"])
