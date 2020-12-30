@@ -19,3 +19,6 @@ nodes:
     - containerPort: 30007
       hostPort: 7777
       listenAddress: "127.0.0.1"
+- role: "worker"
+- role: "worker"
+- role: "worker"
