@@ -10,6 +10,7 @@ import (
 )
 
 type runner struct {
+	flag   *flag
 	logger logger.Interface
 }
 
@@ -31,7 +32,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "deleting kind cluster")
 
-		out, err = exec.Command("kind", "delete", "cluster").CombinedOutput()
+		out, err = exec.Command("kind", "delete", "cluster", "--name", r.flag.Cluster).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}

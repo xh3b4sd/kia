@@ -35,7 +35,6 @@ spec:
                     nodePort: 30007
                     port: 30007
                     targetPort: 7777
-  components:
     pilot:
       k8s:
         # We limit the resources istiod consumes in the local setup. The pilot

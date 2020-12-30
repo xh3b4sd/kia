@@ -24,6 +24,7 @@ func New(config Config) (*cobra.Command, error) {
 	var c *cobra.Command
 	{
 		r := &runner{
+			flag:   &flag{},
 			logger: config.Logger,
 		}
 
@@ -33,6 +34,8 @@ func New(config Config) (*cobra.Command, error) {
 			Long:  long,
 			RunE:  r.Run,
 		}
+
+		r.flag.Init(c)
 	}
 
 	return c, nil
