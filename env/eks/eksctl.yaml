@@ -7,9 +7,9 @@ metadata:
 
 nodeGroups:
   - name: "ng001"
-    desiredCapacity: 2
-    maxSize: 3
-    minSize: 1
+    desiredCapacity: 3
+    maxSize: 4
+    minSize: 3
     instanceType: "t3.large"
     ssh:
       allow: false
