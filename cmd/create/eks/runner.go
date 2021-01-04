@@ -309,25 +309,6 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		}
 	}
 
-	// Istio assets like gateways and their corresponding certificates have to
-	// be installed once cert-manager is properly setup.
-	{
-		r.logger.Log(ctx, "level", "info", "message", "installing istio-asset chart")
-
-		out, err = exec.Command(
-			"helm",
-			"install",
-			"istio-asset",
-			mustAbs(r.flag.KiaPath, "env/eks/istio-asset/"),
-			"--namespace", "istio-system",
-			"--set", "cluster.name="+r.flag.Cluster,
-			"--set", "cluster.zone="+secrets["aws.hostedzone"],
-		).CombinedOutput()
-		if err != nil {
-			return tracer.Maskf(executionFailedError, "%s", out)
-		}
-	}
-
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing flux toolkit")
 
