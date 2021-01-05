@@ -38,7 +38,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "deleting istio-asset chart")
 
-		out, err = exec.Command("helm", "delete", "istio-asset", "--namespace", "istio-system").CombinedOutput()
+		out, err = exec.Command("helm", "delete", "istio-eks", "--namespace", "istio-system").CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -46,7 +46,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 
 	// We use istio gateways and external-dns to register DNS records in
 	// Route53. In order to cleanup the cluster specific DNS records we need to
-	// delete the istio-asset chart first and let external-dns take care of the
+	// delete the istio-eks chart first and let external-dns take care of the
 	// cleanup procedure. For now the mechanism is purely time based, which
 	// means we just wait for 5 minutes. This implies the cleanup might fail and
 	// we proceed deleting the cluster regardless, leaving behind Route53 DNS
