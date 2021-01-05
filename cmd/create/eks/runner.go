@@ -327,6 +327,8 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"venturemark",
 			"--path",
 			fmt.Sprintf("eks-%s-%s", u.Username, r.flag.Cluster),
+			"--private",
+			"false",
 			"--repository",
 			"flux",
 			"--token-auth",
