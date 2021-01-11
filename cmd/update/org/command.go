@@ -17,13 +17,13 @@ expected config file location on your file system, including the required
 structure and its associated values.
 
     $ cat ~/.config/kia/config.yaml
-    kia: "~/projects/xh3b4sd/kia/"
+    kia: "~/project/xh3b4sd/kia/"
     org:
       list:
         - org: "xh3b4sd"
-          sec: "~/projects/xh3b4sd/sec/"
+          sec: "~/project/xh3b4sd/sec/"
         - org: "yourorg"
-          sec: "~/projects/yourorg/sec/"
+          sec: "~/project/yourorg/sec/"
       selected: "xh3b4sd"
 
 Given the example config file above the organization used by kia can be
