@@ -39,6 +39,8 @@ go get github.com/xh3b4sd/kia
   environment using Kind up and running.
 - [eksctl] for working with AWS and EKS clusters. `kia` uses that to create EKS
   clusters. A config file is provided when creating the EKS cluster.
+- [flux] for our deployment pipeline. All application level workload is managed
+  with an automated git-ops approach.
 - [golang] for installation of `kia` and `red` on your machine. You will also
   need go if you intend to develop the project further.
 - [grpcurl] for playing with gRPC apis. Always useful to have when working with
@@ -207,6 +209,7 @@ Flags:
 [aws-iam-authenticator]: https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
 [docker]: https://www.docker.com/get-started
 [eksctl]: https://eksctl.io
+[flux]: https://toolkit.fluxcd.io/guides/installation
 [golang]: https://github.com/moovweb/gvm
 [grpcurl]: https://github.com/fullstorydev/grpcurl
 [helm]: https://helm.sh/docs/intro/install
