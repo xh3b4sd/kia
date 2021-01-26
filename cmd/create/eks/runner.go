@@ -155,7 +155,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing service mesh")
 
-		out, err = exec.Command("istioctl", "install", "-f", mustAbs(r.flag.KiaPath, "env/eks/istio.yaml")).CombinedOutput()
+		out, err = exec.Command("istioctl", "install", "-f", mustAbs(r.flag.KiaPath, "env/eks/istio.yaml", "--skip-confirmation")).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
