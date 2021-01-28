@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -295,6 +295,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 				"--set", "aws.accessid="+secrets["aws.accessid"],
 				"--set", "aws.region="+r.flag.Region,
 				"--set", "aws.secretid="+secrets["aws.secretid"],
+				"--set", "cloudflare.token="+secrets["cloudflare.token"],
 			).CombinedOutput()
 			if err != nil {
 				return tracer.Maskf(executionFailedError, "%s", out)
