@@ -2,6 +2,7 @@ package knd
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -98,7 +99,18 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "installing infra chart")
 
-		out, err = exec.Command("helm", "-n", "infra", "install", "infra", mustAbs(r.flag.KiaPath, "env/def/infra/"), "--set", "dockerconfigjson="+mustAuth(secrets)).CombinedOutput()
+		out, err = exec.Command(
+			"helm",
+			"install",
+			"infra",
+			mustAbs(r.flag.KiaPath, "env/def/infra/"),
+			"--namespace", "infra",
+			"--set", "dockerconfigjson="+mustAuth(secrets),
+			"--set", "oauth.client.id="+mustBase64(secrets["oauth.client.id"]),
+			"--set", "oauth.client.secret="+mustBase64(secrets["oauth.client.secret"]),
+			"--set", "oauth.cookie.domain="+mustBase64(secrets["oauth.cookie.domain"]),
+			"--set", "oauth.cookie.secret="+mustBase64(secrets["oauth.cookie.secret"]),
+		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}
@@ -118,16 +130,11 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			"flux",
 			"bootstrap",
 			"github",
-			"--owner",
-			"venturemark",
-			"--path",
-			fmt.Sprintf("knd-%s-%s", u.Username, r.flag.Cluster),
-			"--private",
-			"false",
-			"--repository",
-			"flux",
-			"--token-auth",
-			"true",
+			"--owner", "venturemark",
+			"--path", fmt.Sprintf("knd-%s-%s", u.Username, r.flag.Cluster),
+			"--private", "false",
+			"--repository", "flux",
+			"--token-auth", "true",
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
@@ -169,4 +176,8 @@ func mustAuth(s map[string]string) string {
 	}
 
 	return enc
+}
+
+func mustBase64(s string) string {
+	return base64.URLEncoding.EncodeToString([]byte(s))
 }

@@ -1,0 +1,8 @@
+dockerconfigjson: ""
+oauth:
+  client:
+    id: ""
+    secret: ""
+  cookie:
+    domain: ""
+    secret: ""
