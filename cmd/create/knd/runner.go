@@ -106,10 +106,8 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 			mustAbs(r.flag.KiaPath, "env/def/infra/"),
 			"--namespace", "infra",
 			"--set", "dockerconfigjson="+mustAuth(secrets),
-			"--set", "oauth.client.id="+mustBase64(secrets["oauth.client.id"]),
-			"--set", "oauth.client.secret="+mustBase64(secrets["oauth.client.secret"]),
-			"--set", "oauth.cookie.domain="+mustBase64(secrets["oauth.cookie.domain"]),
-			"--set", "oauth.cookie.secret="+mustBase64(secrets["oauth.cookie.secret"]),
+			"--set", "oauth.google.id="+mustBase64(secrets["oauth.google.id"]),
+			"--set", "oauth.google.secret="+mustBase64(secrets["oauth.google.secret"]),
 		).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
