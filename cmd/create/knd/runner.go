@@ -76,7 +76,7 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		}
 
 		if r.flag.Image != "" {
-			args = append(args, r.flag.Image)
+			args = append(args, "--image", r.flag.Image)
 		}
 
 		out, err = exec.Command("kind", args...).CombinedOutput()
