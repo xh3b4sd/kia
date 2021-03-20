@@ -69,10 +69,8 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 		args := []string{
 			"create",
 			"cluster",
-			"--config",
-			mustAbs(r.flag.KiaPath, "env/knd/kind.yaml"),
-			"--name",
-			r.flag.Cluster,
+			"--config", mustAbs(r.flag.KiaPath, "env/knd/kind.yaml"),
+			"--name", r.flag.Cluster,
 		}
 
 		if r.flag.Image != "" {
