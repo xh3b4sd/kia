@@ -66,7 +66,20 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	{
 		r.logger.Log(ctx, "level", "info", "message", "creating kind cluster")
 
-		out, err = exec.Command("kind", "create", "cluster", "--config", mustAbs(r.flag.KiaPath, "env/knd/kind.yaml"), "--name", r.flag.Cluster).CombinedOutput()
+		args := []string{
+			"create",
+			"cluster",
+			"--config",
+			mustAbs(r.flag.KiaPath, "env/knd/kind.yaml"),
+			"--name",
+			r.flag.Cluster,
+		}
+
+		if r.flag.Image != "" {
+			args = append(args, r.flag.Image)
+		}
+
+		out, err = exec.Command("kind", args...).CombinedOutput()
 		if err != nil {
 			return tracer.Maskf(executionFailedError, "%s", out)
 		}

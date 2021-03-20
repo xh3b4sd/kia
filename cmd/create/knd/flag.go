@@ -13,12 +13,14 @@ import (
 
 type flag struct {
 	Cluster string
+	Image   string
 	KiaPath string
 	SecPath string
 }
 
 func (f *flag) Init(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&f.Cluster, "cluster", "c", "kind", "Cluster ID of the Kind cluster.")
+	cmd.Flags().StringVarP(&f.Image, "image", "i", "", "Kind cluster image to use.")
 	cmd.Flags().StringVarP(&f.KiaPath, "kia", "k", config.GetKia(os.Getenv(env.KiaBasePath)), "Kia base path on the local file system.")
 	cmd.Flags().StringVarP(&f.SecPath, "sec", "s", config.GetSec(os.Getenv(env.SecBasePath)), "Sec base path on the local file system.")
 }
