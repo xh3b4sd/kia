@@ -2,23 +2,34 @@ kind: "Cluster"
 apiVersion: "kind.x-k8s.io/v1alpha4"
 name: "kind"
 nodes:
-- role: "control-plane"
-  extraPortMappings:
-    # The webclient web app is available through this port on the host machine.
-    #
-    #     http://127.0.0.1:3000
-    #
-    - containerPort: 30003
-      hostPort: 3000
-      listenAddress: "127.0.0.1"
-    # The apiserver backend service is available through this port on the host
-    # machine.
-    #
-    #     http://127.0.0.1:7777
-    #
-    - containerPort: 30007
-      hostPort: 7777
-      listenAddress: "127.0.0.1"
-- role: "worker"
-- role: "worker"
-- role: "worker"
+  - role: "control-plane"
+    extraPortMappings:
+      # The webclient web app is available through this port on the host machine.
+      #
+      #     http://127.0.0.1:3000
+      #
+      - containerPort: 30003
+        hostPort: 3000
+        listenAddress: "127.0.0.1"
+
+      # The apiserver backend service is available through this port on the host
+      # machine.
+      #
+      #     http://127.0.0.1:7777
+      #
+      - containerPort: 30007
+        hostPort: 7777
+        listenAddress: "127.0.0.1"
+
+      # The prometheus backend service is available through this port on the
+      # host machine.
+      #
+      #     http://127.0.0.1:9090
+      #
+      - containerPort: 30009
+        hostPort: 9090
+        listenAddress: "127.0.0.1"
+
+  - role: "worker"
+  - role: "worker"
+  - role: "worker"

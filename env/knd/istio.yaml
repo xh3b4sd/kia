@@ -23,6 +23,7 @@ spec:
                     nodePort: 30003
                     port: 30003
                     targetPort: 3000
+
                 # The apiserver port mapping works as follows.
                 #
                 #      host       |                container                |        k8s
@@ -35,6 +36,19 @@ spec:
                     nodePort: 30007
                     port: 30007
                     targetPort: 7777
+
+                # The prometheus port mapping works as follows.
+                #
+                #      host       |                container                |        k8s
+                #
+                #     :9090    <----->    :30009    <----->    :30009    <----->    :9090
+                #
+                - path: "spec.ports[6]"
+                  value:
+                    name: "prometheus"
+                    nodePort: 30009
+                    port: 30009
+                    targetPort: 9090
     pilot:
       k8s:
         # We limit the resources istiod consumes in the local setup. The pilot

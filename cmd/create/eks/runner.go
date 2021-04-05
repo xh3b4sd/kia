@@ -176,6 +176,15 @@ func (r *runner) run(ctx context.Context, cmd *cobra.Command, args []string) err
 	}
 
 	{
+		r.logger.Log(ctx, "level", "info", "message", "creating monitoring namespace")
+
+		out, err = exec.Command("kubectl", "create", "namespace", "monitoring").CombinedOutput()
+		if err != nil {
+			return tracer.Maskf(executionFailedError, "%s", out)
+		}
+	}
+
+	{
 		r.logger.Log(ctx, "level", "info", "message", "installing infra chart")
 
 		out, err = exec.Command(
