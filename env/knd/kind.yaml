@@ -30,6 +30,14 @@ nodes:
         hostPort: 9090
         listenAddress: "127.0.0.1"
 
+      # The grafana web app is available through this port on the host machine.
+      #
+      #     http://127.0.0.1:3030
+      #
+      - containerPort: 30030
+        hostPort: 3030
+        listenAddress: "127.0.0.1"
+
   - role: "worker"
   - role: "worker"
   - role: "worker"

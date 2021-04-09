@@ -49,6 +49,19 @@ spec:
                     nodePort: 30009
                     port: 30009
                     targetPort: 9090
+
+                # The prometheus port mapping works as follows.
+                #
+                #      host       |                container                |        k8s
+                #
+                #     :3030    <----->    :30030    <----->    :30030    <----->    :3030
+                #
+                - path: "spec.ports[7]"
+                  value:
+                    name: "prometheus"
+                    nodePort: 30030
+                    port: 30030
+                    targetPort: 3030
     pilot:
       k8s:
         # We limit the resources istiod consumes in the local setup. The pilot
