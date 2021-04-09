@@ -58,7 +58,7 @@ spec:
                 #
                 - path: "spec.ports[7]"
                   value:
-                    name: "prometheus"
+                    name: "grafana"
                     nodePort: 30030
                     port: 30030
                     targetPort: 3030
